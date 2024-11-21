@@ -95,18 +95,18 @@ function Toggle({ id }) {
   }
 
   return (
-    <StyledToggle onClick={handleClick} >
+    <StyledToggle onClick={handleClick}>
       <HiEllipsisVertical />
     </StyledToggle>
   );
 }
 function List({ id, children }) {
   const { openId, position, close } = useContext(MenusContext);
-  const {ref} = useOutsideClick(close)
+  const { ref } = useOutsideClick(close);
 
   if (openId !== id) return null;
   return createPortal(
-    <StyledList position={position} ref={ref} >
+    <StyledList position={position} ref={ref}>
       {children}
     </StyledList>,
     document.body
