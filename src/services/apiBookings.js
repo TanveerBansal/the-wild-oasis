@@ -1,22 +1,35 @@
+import { PAGE_SIZE } from "../utils/constants";
 import { getToday } from "../utils/helpers";
 import supabase from "./supabase";
 
 
-export async function getBookings({ filter }) {
+export async function getBookings({ filter, page, sortBy }) {
   let query = supabase
     .from("bookings")
-    .select("id, created_at,startDate, endDate, numNights, status, totalPrice, cabins(name), guests(fullName, email)") //here we have data in cabin and guests id's, to access that do cabins(-nameOfRequiredItems-) and if you want all items do -> cabins(*)
+    .select("id, created_at,startDate, endDate, numNights, status, totalPrice, cabins(name), guests(fullName, email)", { count: "estimated" }) //here we have data in cabin and guests id's, to access that do cabins(-nameOfRequiredItems-) and if you want all items do -> cabins(*)
 
   //FILTER__
-  if (filter !== null) query = query[filter.method || "eq"](filter.field, filter.value)
-  const { data, error } = await query
+  if (filter) query = query[filter.method || "eq"](filter.field, filter.value)
 
-    if(error) {
-      console.log(error);
-  throw new Error("Booking could not be loaded")
+  //SORT
+  if (sortBy) query = query.order(sortBy.field, { ascending: sortBy.direction === "asc" })
 
-}
-return data
+
+  //PAGINATION
+  if (page) {
+    const from = (page - 1) * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
+    query = query.range(from, to)
+  }
+
+  const { data, error, count } = await query
+
+  if (error) {
+    console.log(error);
+    throw new Error("Booking could not be loaded")
+
+  }
+  return { data, count }
 }
 
 export async function getBooking(id) {
