@@ -7,10 +7,11 @@ export function useCheckin() {
     const queryClient = useQueryClient()
     const navigate = useNavigate()
     const { mutate: checkin, isLoading: isCheckingIn } = useMutation({
-        mutationFn: (bookingId) => updateBooking(bookingId, {
+        mutationFn: ({bookingId,breakfast}) => updateBooking(bookingId, {
             status: "checked-in",
-            isPaid: true
-        }),
+            isPaid: true,
+            ...breakfast
+        }),//mutationfn parameter can accept only one value, so we have to pass object
         onSuccess: (data) => {
             toast.success(`Booking ${data.id} succesfully checked in`)
             queryClient.invalidateQueries({ active: true })
