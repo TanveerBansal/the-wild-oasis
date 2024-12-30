@@ -108,6 +108,7 @@ export async function updateBooking(id, obj) {
     .eq("id", id)
     .select()
     .single();
+console.log(id , "delete", obj);
 
   if (error) {
     console.error(error);
